@@ -72,32 +72,32 @@ export default function AdminClient({ currentUser, profiles }) {
       return
     }
 
-    if (!confirm(`Are you sure you want to delete user ${email}? This action cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to permanently delete user ${email}? This will remove them from authentication and they won't be able to log in again. This action cannot be undone.`)) {
       return
     }
 
     setLoading(userId)
     try {
-      // Delete user's todos first
-      const { error: todosError } = await supabase
-        .from('todos')
-        .delete()
-        .eq('user_id', userId)
+      // Call API route to delete user from auth (will cascade delete profile and todos)
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      })
 
-      if (todosError) throw todosError
+      const data = await response.json()
 
-      // Delete user profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
-
-      if (profileError) throw profileError
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete user')
+      }
 
       setUsers(users.filter(user => user.id !== userId))
-      toast.success('User deleted successfully')
+      toast.success('User permanently deleted from system')
     } catch (error) {
-      toast.error(error.message)
+      console.error('Delete user error:', error)
+      toast.error(error.message || 'Failed to delete user')
     } finally {
       setLoading(null)
     }
