@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase-client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Card, CardContent } from '@/components/ui/card'
 import { LogOut, Plus, Shield } from 'lucide-react'
 import TodoList from './TodoList'
 import AddTodoDialog from './AddTodoDialog'
@@ -143,13 +144,23 @@ export default function DashboardClient({ user, profile, initialTodos }) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-screen bg-linear-to-br from-zinc-50 via-zinc-50 to-zinc-100 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-900">
       {/* Header */}
-      <header className="border-b bg-white dark:bg-zinc-900 sticky top-0 z-50">
+      <header className="border-b bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            Todo App
-          </h1>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">T</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                TodoApp
+              </h1>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Your productivity companion
+              </p>
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             {profile?.is_admin && (
               <Button
@@ -158,16 +169,16 @@ export default function DashboardClient({ user, profile, initialTodos }) {
                 className="gap-2"
               >
                 <Shield className="h-4 w-4" />
-                Admin Panel
+                <span className="hidden sm:inline">Admin Panel</span>
               </Button>
             )}
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarFallback>
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-linear-to-br from-blue-500 to-purple-600 text-white text-sm font-semibold">
                   {getInitials(user.user_metadata?.full_name || user.email)}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden sm:block">
+              <div className="hidden md:block">
                 <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                   {user.user_metadata?.full_name || 'User'}
                 </p>
@@ -176,7 +187,13 @@ export default function DashboardClient({ user, profile, initialTodos }) {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleSignOut}
+              className="hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50 dark:hover:text-red-400"
+              title="Sign out"
+            >
               <LogOut className="h-5 w-5" />
             </Button>
           </div>
@@ -184,32 +201,120 @@ export default function DashboardClient({ user, profile, initialTodos }) {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-10 max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h2 className="text-4xl font-bold bg-linear-to-r from-zinc-900 to-zinc-600 dark:from-zinc-50 dark:to-zinc-400 bg-clip-text text-transparent">
+            My Todos
+          </h2>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-2 text-lg">
+            Manage your tasks efficiently and stay organized
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-blue-200 dark:border-blue-800 hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Tasks</p>
+                  <h3 className="text-3xl font-bold text-blue-900 dark:text-blue-50 mt-2">{todos.length}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-xl bg-blue-500 flex items-center justify-center shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 border-purple-200 dark:border-purple-800 hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Today&apos;s Tasks</p>
+                  <h3 className="text-3xl font-bold text-purple-900 dark:text-purple-50 mt-2">{todaysTodos.length}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-xl bg-purple-500 flex items-center justify-center shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/30 border-green-200 dark:border-green-800 hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-600 dark:text-green-400">Completed</p>
+                  <h3 className="text-3xl font-bold text-green-900 dark:text-green-50 mt-2">{completedTodos.length}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-xl bg-green-500 flex items-center justify-center shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-linear-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 border-orange-200 dark:border-orange-800 hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Pending</p>
+                  <h3 className="text-3xl font-bold text-orange-900 dark:text-orange-50 mt-2">{pendingTodos.length}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Add Todo Button */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-              My Todos
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400 mt-1">
-              Manage your tasks efficiently
+            <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+              Your Tasks
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+              Organize your work and life, finally.
             </p>
           </div>
-          <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Todo
+          <Button 
+            onClick={() => setIsAddDialogOpen(true)} 
+            className="gap-2 bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg h-11 px-6"
+            size="lg"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Add Task</span>
           </Button>
         </div>
 
         <Tabs defaultValue="today" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="today">
-              Today&apos;s Todos ({todaysTodos.length})
+          <TabsList className="grid w-full max-w-lg grid-cols-3 bg-white dark:bg-zinc-900 p-1 rounded-xl shadow-md">
+            <TabsTrigger value="today" className="data-[state=active]:bg-linear-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">
+              <span className="hidden sm:inline">Today&apos;s Todos</span>
+              <span className="sm:hidden">Today</span>
+              <span className="ml-1.5">({todaysTodos.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="completed">
-              Completed ({completedTodos.length})
+            <TabsTrigger value="completed" className="data-[state=active]:bg-linear-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white rounded-lg">
+              <span className="hidden sm:inline">Completed</span>
+              <span className="sm:hidden">Done</span>
+              <span className="ml-1.5">({completedTodos.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="pending">
-              Pending ({pendingTodos.length})
+            <TabsTrigger value="pending" className="data-[state=active]:bg-linear-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-600 data-[state=active]:text-white rounded-lg">
+              <span className="hidden sm:inline">Pending</span>
+              <span className="sm:hidden">Todo</span>
+              <span className="ml-1.5">({pendingTodos.length})</span>
             </TabsTrigger>
           </TabsList>
 

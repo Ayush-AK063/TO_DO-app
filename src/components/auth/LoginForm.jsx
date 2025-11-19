@@ -28,8 +28,35 @@ export default function LoginForm() {
       })
 
       if (error) {
-        console.error('Login error:', error)
-        throw error
+        // Handle specific error cases with user-friendly messages
+        if (error.message === 'Invalid login credentials') {
+          toast.error('Invalid email or password. Please check your credentials.')
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Please verify your email before logging in.')
+        } else {
+          toast.error('Login failed. Please try again.')
+        }
+        setLoading(false)
+        return
+      }
+
+      // Check if user is blocked
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_blocked')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profileError) {
+        console.error('Profile check error:', profileError)
+      }
+
+      // If user is blocked, sign them out and show error
+      if (profile?.is_blocked) {
+        await supabase.auth.signOut()
+        toast.error('Your account has been blocked. Please contact support.')
+        setLoading(false)
+        return
       }
 
       toast.success('Logged in successfully!')
@@ -37,8 +64,7 @@ export default function LoginForm() {
       router.refresh()
     } catch (error) {
       console.error('Login error:', error)
-      toast.error(error.message || 'Invalid email or password')
-    } finally {
+      toast.error('An unexpected error occurred. Please try again.')
       setLoading(false)
     }
   }
@@ -50,7 +76,7 @@ export default function LoginForm() {
         <CardDescription>Enter your credentials to access your account</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pb-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -74,7 +100,7 @@ export default function LoginForm() {
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
+        <CardFooter className="flex flex-col space-y-4 pt-2">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
