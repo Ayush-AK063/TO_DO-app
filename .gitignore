@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# documentation (exclude README.md)
+*-COMPLETE.md
+*-ENHANCED.md
+*-IMPROVEMENTS.md
+*-FUNCTIONALITY.md
+*-COMPARISON.md
+*-SUMMARY.md
+DEPLOY-*.md
+ADD-*.md
+START-HERE.md
+FIXES-*.md
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json

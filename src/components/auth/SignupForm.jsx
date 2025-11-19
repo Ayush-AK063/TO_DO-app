@@ -59,7 +59,7 @@ export default function SignupForm() {
         return
       }
 
-      toast.success('Account created successfully! Please check your email to verify.')
+      toast.success('Account created successfully!')
       router.push('/login')
     } catch (error) {
       console.error('Signup error:', error)
@@ -76,7 +76,7 @@ export default function SignupForm() {
         <CardDescription>Create a new account to get started</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pb-6">
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <Input
@@ -112,7 +112,7 @@ export default function SignupForm() {
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
+        <CardFooter className="flex flex-col space-y-4 pt-2">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Creating account...' : 'Sign Up'}
           </Button>

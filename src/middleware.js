@@ -38,22 +38,31 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirect to dashboard if already logged in and trying to access login/signup
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
-  // Check admin access
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  // Check if user is blocked (for all authenticated routes)
+  if (user && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('is_admin')
+      .select('is_blocked, is_admin')
       .eq('id', user.id)
       .single()
 
-    if (!profile?.is_admin) {
+    // If user is blocked, sign them out and redirect to login
+    if (profile?.is_blocked) {
+      await supabase.auth.signOut()
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('blocked', 'true')
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // Check admin access for admin routes
+    if (request.nextUrl.pathname.startsWith('/admin') && !profile?.is_admin) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
+  }
+
+  // Redirect to dashboard if already logged in and trying to access login/signup
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup' || request.nextUrl.pathname === '/')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return supabaseResponse
