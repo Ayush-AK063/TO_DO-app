@@ -69,6 +69,9 @@ export default function DashboardClient({ user, profile, initialTodos }) {
 
       if (error) throw error
 
+      // Manually update the state to show the new todo immediately
+      setTodos((prev) => [data, ...prev])
+
       toast.success('Todo added successfully!')
       setIsAddDialogOpen(false)
     } catch (error) {
@@ -85,6 +88,11 @@ export default function DashboardClient({ user, profile, initialTodos }) {
 
       if (error) throw error
 
+      // Manually update the state to show changes immediately
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === id ? { ...todo, ...updates } : todo))
+      )
+
       toast.success('Todo updated successfully!')
     } catch (error) {
       toast.error(error.message)
@@ -96,6 +104,9 @@ export default function DashboardClient({ user, profile, initialTodos }) {
       const { error } = await supabase.from('todos').delete().eq('id', id)
 
       if (error) throw error
+
+      // Manually update the state to remove the deleted todo immediately
+      setTodos((prev) => prev.filter((todo) => todo.id !== id))
 
       toast.success('Todo deleted successfully!')
     } catch (error) {
